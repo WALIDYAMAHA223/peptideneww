@@ -1,4 +1,4 @@
-export const WA_NUM = '32491143339';
+export const WA_NUM = '32465983104';
 export const wa = (m) => `https://wa.me/${WA_NUM}?text=${encodeURIComponent(m)}`;
 
 export const BAC_WATER_PRICE = 3;
