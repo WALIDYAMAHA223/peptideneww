@@ -269,7 +269,7 @@ img {
   justify-content: center;
   gap: 4rem;
   overflow: hidden;
-  background: var(--navy-900)
+  background: #050505;
 }
 
 .hero-bg {
@@ -2790,13 +2790,27 @@ img {
   }
 
   .hero h1 {
-    font-size: 2rem
+    font-size: clamp(1.8rem, 8vw, 2.4rem);
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+
+  .hero-anim-p {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    max-width: 90%;
+    margin-bottom: 2rem;
   }
 
   .hero-product-showcase {
     margin: 0 auto;
-    width: calc(100% - 2rem);
-    max-width: 400px
+    width: calc(100% - 2.5rem);
+    max-width: 380px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
   }
 
   .hero-product-img-wrap {

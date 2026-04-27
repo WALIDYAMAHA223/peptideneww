@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function HeroCanvas() {
+export default function HeroCanvas({ isMobile }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -21,6 +21,47 @@ export default function HeroCanvas() {
 
     const W = () => canvas.width / (window.devicePixelRatio || 1);
     const H = () => canvas.height / (window.devicePixelRatio || 1);
+
+    // --- MOBILE SPECIFIC BACKGROUND (Fluid Plasma) ---
+    function drawMobileFluid(time) {
+      const w = W(), h = H();
+      const centerX = w * 0.5;
+      const centerY = h * 0.5;
+      
+      ctx.globalCompositeOperation = 'screen';
+      
+      for (let i = 0; i < 3; i++) {
+        const radius = Math.min(w, h) * (0.4 + i * 0.1);
+        const gradient = ctx.createRadialGradient(
+          centerX + Math.sin(time * 0.3 + i) * (w * 0.2),
+          centerY + Math.cos(time * 0.2 + i) * (h * 0.2),
+          0,
+          centerX + Math.sin(time * 0.3 + i) * (w * 0.2),
+          centerY + Math.cos(time * 0.2 + i) * (h * 0.2),
+          radius
+        );
+        
+        const alpha = 0.05 - i * 0.01;
+        const color = i % 2 === 0 ? '196, 30, 58' : '201, 169, 78';
+        gradient.addColorStop(0, `rgba(${color}, ${alpha})`);
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, w, h);
+      }
+      
+      ctx.globalCompositeOperation = 'source-over';
+      
+      // Simple dots for mobile
+      ctx.fillStyle = 'rgba(201, 169, 78, 0.15)';
+      for (let i = 0; i < 15; i++) {
+        const x = (Math.sin(time * 0.1 + i) * 0.5 + 0.5) * w;
+        const y = (Math.cos(time * 0.15 + i * 0.5) * 0.5 + 0.5) * h;
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
 
     // --- Hexagonal grid (lab / molecular) ---
     function drawHexGrid(time) {
@@ -179,7 +220,8 @@ export default function HeroCanvas() {
 
     // --- Floating particles (embers / lab sparks) ---
     const particles = [];
-    for (let i = 0; i < 50; i++) {
+    const pCount = isMobile ? 15 : 50;
+    for (let i = 0; i < pCount; i++) {
       particles.push({
         x: Math.random() * 2000,
         y: Math.random() * 1200,
@@ -214,8 +256,6 @@ export default function HeroCanvas() {
       });
     }
 
-    // --- Scanning line (lab scanner effect) removed ---
-
     // --- Main render loop ---
     function render() {
       const dpr = window.devicePixelRatio || 1;
@@ -223,12 +263,17 @@ export default function HeroCanvas() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.scale(dpr, dpr);
 
-      t += 0.016;
+      t += isMobile ? 0.008 : 0.016;
 
-      drawHexGrid(t);
-      drawDNA(t);
-      drawSpartanGeometry(t);
-      drawParticles(t);
+      if (isMobile) {
+        drawMobileFluid(t);
+        drawParticles(t);
+      } else {
+        drawHexGrid(t);
+        drawDNA(t);
+        drawSpartanGeometry(t);
+        drawParticles(t);
+      }
 
       animId = requestAnimationFrame(render);
     }
@@ -239,7 +284,7 @@ export default function HeroCanvas() {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <canvas

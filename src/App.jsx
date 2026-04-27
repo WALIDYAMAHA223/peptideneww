@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import ParticleField from './components/ParticleField';
 import ProductModal from './components/ProductModal';
 import InfoModal from './components/InfoModal';
@@ -64,13 +64,13 @@ function Navbar() {
 }
 
 /* ═══ HERO ═══ */
-function Hero() {
+function Hero({ isMobile }) {
   return (
     <section className="hero" id="hero">
       <div className="hero-overlay" />
-      <HeroCanvas />
+      <HeroCanvas isMobile={isMobile} />
       <div className="glow-orb glow-orb-1" /><div className="glow-orb glow-orb-2" /><div className="glow-orb glow-orb-3" />
-      <ParticleField color="#c41e3a" count={60} />
+      {!isMobile && <ParticleField color="#c41e3a" count={60} />}
       <div className="hero-content">
         <h1 className="hero-anim-h1">Solutions Peptidiques Avancées.<br />Libérez le Potentiel Biologique.</h1>
         <p className="hero-anim-p">Pureté maximale, tests rigoureux, livraison mondiale.<br />Découvrez nos composés pour la recherche et la performance.</p>
@@ -328,6 +328,14 @@ function FloatingWA() {
 export default function App() {
   const [detailProduct, setDetailProduct] = useState(null);
   const [infoModal, setInfoModal] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -345,7 +353,7 @@ export default function App() {
       <ScrollProgress />
       <Navbar />
       <main>
-        <Hero />
+        <Hero isMobile={isMobile} />
         <TrustBadges />
         <FeaturedProducts onDetail={setDetailProduct} />
         <LearnSection />
